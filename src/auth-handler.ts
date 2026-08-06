@@ -53,6 +53,7 @@ async function redirectToGoogle(
     "email", // User email address
     "https://www.googleapis.com/auth/gmail.modify", // Modify Gmail data
     "https://www.googleapis.com/auth/gmail.readonly", // Read Gmail data
+    "https://www.googleapis.com/auth/gmail.settings.basic", // Read Gmail settings (e.g. signature)
     "https://www.googleapis.com/auth/drive", // Access Google Drive
     "https://www.googleapis.com/auth/calendar", // Access Google Calendar
     "https://www.googleapis.com/auth/tasks", // Access Google Tasks
