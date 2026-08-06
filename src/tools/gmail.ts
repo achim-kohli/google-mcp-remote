@@ -12,6 +12,7 @@ export function registerGmailTools(server: McpServer, props: Props) {
     auth.setCredentials({ access_token: props.accessToken });
     return google.gmail({ version: "v1", auth });
   };
+  const getDefaultSignature = async (gmail: gmail_v1.Gmail): Promise<string> => { try { const res = await gmail.users.settings.sendAs.list({ userId: "me" }); const sendAsList = res.data.sendAs || []; const defaultSendAs = sendAsList.find((s) => s.isDefault) || sendAsList[0]; return defaultSendAs?.signature || ""; } catch (err) { console.error("Error fetching Gmail signature:", err); return ""; } };
 
   // Tool to send an email (Updated)
   server.tool(
@@ -40,16 +41,17 @@ export function registerGmailTools(server: McpServer, props: Props) {
     async ({ to, subject, body, cc, bcc, isHtml }) => {
       try {
         const gmail = getGmailClient();
+        const signature = await getDefaultSignature(gmail); let finalBody = body; let finalIsHtml = isHtml; if (signature) { if (isHtml) { finalBody = `${body}<br><br>${signature}`; } else { const htmlBody = body.replace(/\n/g, "<br>"); finalBody = `${htmlBody}<br><br>${signature}`; finalIsHtml = true; } }
         const emailLines = [];
         emailLines.push(`To: ${to.join(", ")}`);
         if (cc && cc.length) emailLines.push(`Cc: ${cc.join(", ")}`);
         if (bcc && bcc.length) emailLines.push(`Bcc: ${bcc.join(", ")}`);
         emailLines.push(`Subject: ${subject}`);
         emailLines.push(
-          `Content-Type: ${isHtml ? "text/html" : "text/plain"}; charset=utf-8`
+          `Content-Type: ${finalIsHtml ? "text/html" : "text/plain"}; charset=utf-8`
         );
         emailLines.push("");
-        emailLines.push(body);
+        emailLines.push(finalBody);
 
         const email = emailLines.join("\r\n");
         const encodedEmail = Buffer.from(email)
