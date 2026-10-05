@@ -22,7 +22,7 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
         content: [{ type: "text", text: `Hello, ${name}!` }],
       })
     );
-    registerAllTools(this.server, this.props);
+    registerAllTools(this.server, { ...this.props, clientId: this.env.GOOGLE_OAUTH_CLIENT_ID, clientSecret: this.env.GOOGLE_OAUTH_CLIENT_SECRET });
   }
 }
 
