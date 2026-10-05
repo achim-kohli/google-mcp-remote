@@ -225,3 +225,12 @@ This will start a local development server, typically at http://localhost:8788
 - **Token Expiration**: If you encounter authentication errors, try clearing the KV storage and re-authenticating
 
 Thank you for using Google MCP Remote! If you have any questions or suggestions, feel free to open an issue or contribute to the project.
+
+
+## Unattended access and token refresh
+
+The worker asks Google for offline access, so authorization returns a refresh token alongside the access token. Each tool builds its OAuth2 client with that refresh token plus the app credentials, which lets google-auth-library renew the access token on demand. Before this was added, the one-hour access token simply expired and every Gmail call failed until someone re-authorized by hand.
+
+Grants created before that change hold no refresh token and cannot be repaired. Delete the `grant:` and `token:` entries from the OAUTH_KV namespace and authorize once more.
+
+If the Google OAuth consent screen is still in Testing, Google revokes refresh tokens after seven days regardless of what the worker does. Publish the app, or set the user type to Internal on a Workspace domain, to avoid that.
