@@ -42,7 +42,7 @@ const mcpHandler = {
   },
 };
 
-export default new OAuthProvider({
+const provider = new OAuthProvider({
   apiRoute: ["/sse", "/mcp"],
   apiHandler: mcpHandler as any,
   defaultHandler: GoogleHandler as any,
@@ -50,3 +50,17 @@ export default new OAuthProvider({
   tokenEndpoint: "/token",
   clientRegistrationEndpoint: "/register",
 });
+
+// workers-oauth-provider 0.0.5 answers an expired or missing bearer token with
+// a bare 401. MCP clients only start a fresh OAuth flow when that 401 carries a
+// WWW-Authenticate challenge, so attach one pointing at the metadata document.
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const response = await provider.fetch(request, env, ctx);
+    if (response.status !== 401 || response.headers.has("WWW-Authenticate")) return response;
+    const origin = new URL(request.url).origin;
+    const headers = new Headers(response.headers);
+    headers.set("WWW-Authenticate", 'Bearer resource_metadata="' + origin + '/.well-known/oauth-protected-resource"');
+    return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+  },
+};

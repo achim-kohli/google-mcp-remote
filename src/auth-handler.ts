@@ -42,6 +42,14 @@ app.get("/", (c) => {
   });
 });
 
+// RFC 9728 protected-resource metadata. MCP clients read this to discover
+// which authorization server protects /sse and /mcp. workers-oauth-provider
+// 0.0.5 only serves /.well-known/oauth-authorization-server, so serve it here.
+app.on("GET", ["/.well-known/oauth-protected-resource", "/.well-known/oauth-protected-resource/sse", "/.well-known/oauth-protected-resource/mcp"], (c) => {
+  const origin = new URL(c.req.url).origin;
+  return c.json({ resource: origin, authorization_servers: [origin], bearer_methods_supported: ["header"] });
+});
+
 async function redirectToGoogle(
   request: Request,
   oauthReqInfo: AuthRequest,
