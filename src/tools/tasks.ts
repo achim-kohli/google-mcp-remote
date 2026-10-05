@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { Props } from "../utils/upstream-utils";
 import { google, tasks_v1 } from "googleapis";
+import { createGoogleAuth } from "../utils/google-auth";
 
 // Helper function to update a task
 async function _updateTaskHelper(
@@ -63,8 +64,7 @@ async function _updateTaskHelper(
  */
 export function registerTasksTools(server: McpServer, props: Props) {
   const getTasksClient = () => {
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: props.accessToken });
+    const auth = createGoogleAuth(props);
     return google.tasks({ version: "v1", auth });
   };
 
