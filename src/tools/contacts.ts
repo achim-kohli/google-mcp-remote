@@ -2,14 +2,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { Props } from "../utils/upstream-utils";
 import { google, people_v1 } from "googleapis";
+import { createGoogleAuth } from "../utils/google-auth";
 
 /**
  * Registers Google Contacts (People API) related tools with the MCP server.
  */
 export function registerContactsTools(server: McpServer, props: Props) {
   const getPeopleClient = () => {
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: props.accessToken });
+    const auth = createGoogleAuth(props);
     return google.people({ version: "v1", auth });
   };
 

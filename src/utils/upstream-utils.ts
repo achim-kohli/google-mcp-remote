@@ -37,6 +37,8 @@ export function getUpstreamAuthorizeUrl({
   upstream.searchParams.set("scope", scope);
   if (state) upstream.searchParams.set("state", state);
   upstream.searchParams.set("response_type", "code");
+  upstream.searchParams.set("access_type", "offline");
+  upstream.searchParams.set("prompt", "consent");
   return upstream.href;
 }
 
@@ -103,4 +105,7 @@ export type Props = {
   accessToken: string; // Access token for API calls
   refreshToken?: string; // Optional refresh token
   expiresIn?: number; // Optional expiration time in seconds
+  expiryDate?: number; // Absolute epoch ms when the access token expires
+  clientId?: string; // Injected at runtime from env, never persisted
+  clientSecret?: string; // Injected at runtime from env, never persisted
 };

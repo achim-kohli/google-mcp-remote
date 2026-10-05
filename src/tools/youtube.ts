@@ -2,14 +2,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { Props } from "../utils/upstream-utils";
 import { google, youtube_v3 } from "googleapis";
+import { createGoogleAuth } from "../utils/google-auth";
 
 /**
  * Registers YouTube Data API v3 related tools with the MCP server
  */
 export function registerYouTubeTools(server: McpServer, props: Props) {
   const getYouTubeClient = () => {
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: props.accessToken });
+    const auth = createGoogleAuth(props);
     return google.youtube({ version: "v3", auth });
   };
 

@@ -3,14 +3,14 @@ import { z } from "zod";
 import { Props } from "../utils/upstream-utils";
 import { google, drive_v3 } from "googleapis";
 import { Readable } from "stream"; // Needed for file content handling
+import { createGoogleAuth } from "../utils/google-auth";
 
 /**
  * Registers Drive-related tools with the MCP server
  */
 export function registerDriveTools(server: McpServer, props: Props) {
   const getDriveClient = () => {
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: props.accessToken });
+    const auth = createGoogleAuth(props);
     return google.drive({ version: "v3", auth });
   };
 
