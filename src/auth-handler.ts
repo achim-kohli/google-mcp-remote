@@ -166,6 +166,7 @@ app.get("/callback", async (c) => {
       accessToken: googleAuthTokenResponse.access_token,
       refreshToken: googleAuthTokenResponse.refresh_token,
       expiresIn: googleAuthTokenResponse.expires_in,
+      expiryDate: Date.now() + (googleAuthTokenResponse.expires_in ?? 3600) * 1000,
     } as Props,
   });
   return Response.redirect(redirectTo);
