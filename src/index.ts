@@ -22,7 +22,11 @@ export class MyMCP extends McpAgent<Env, unknown, Props> {
         content: [{ type: "text", text: `Hello, ${name}!` }],
       })
     );
-    registerAllTools(this.server, { ...this.props, clientId: this.env.GOOGLE_OAUTH_CLIENT_ID, clientSecret: this.env.GOOGLE_OAUTH_CLIENT_SECRET });
+    // Tools capture this object once at registration time, but a Durable Object
+    // waking from hibernation can run init() before props are rehydrated. Reading
+    // through a proxy makes every tool call see the credentials that exist now.
+    const liveProps = new Proxy({} as Props, { get: (_t, key) => key === "clientId" ? this.env.GOOGLE_OAUTH_CLIENT_ID : key === "clientSecret" ? this.env.GOOGLE_OAUTH_CLIENT_SECRET : (this.props as any)?.[key] });
+    registerAllTools(this.server, liveProps);
   }
 }
 
