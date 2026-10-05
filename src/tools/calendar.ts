@@ -3,14 +3,14 @@ import { z } from "zod";
 import { Props } from "../utils/upstream-utils";
 import { google } from "googleapis";
 import type { calendar_v3 } from "googleapis";
+import { createGoogleAuth } from "../utils/google-auth";
 
 /**
  * Registers Calendar-related tools with the MCP server
  */
 export function registerCalendarTools(server: McpServer, props: Props) {
   const getCalendarClient = () => {
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: props.accessToken });
+    const auth = createGoogleAuth(props);
     return google.calendar({ version: "v3", auth });
   };
 
