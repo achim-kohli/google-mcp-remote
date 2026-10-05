@@ -2,14 +2,14 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { Props } from "../utils/upstream-utils";
 import { google, gmail_v1 } from "googleapis";
+import { createGoogleAuth } from "../utils/google-auth";
 
 /**
  * Registers Gmail-related tools with the MCP server
  */
 export function registerGmailTools(server: McpServer, props: Props) {
   const getGmailClient = () => {
-    const auth = new google.auth.OAuth2();
-    auth.setCredentials({ access_token: props.accessToken });
+    const auth = createGoogleAuth(props);
     return google.gmail({ version: "v1", auth });
   };
   const getDefaultSignature = async (gmail: gmail_v1.Gmail): Promise<string> => { try { const res = await gmail.users.settings.sendAs.list({ userId: "me" }); const sendAsList = res.data.sendAs || []; const defaultSendAs = sendAsList.find((s) => s.isDefault) || sendAsList[0]; return defaultSendAs?.signature || ""; } catch (err) { console.error("Error fetching Gmail signature:", err); return ""; } };
